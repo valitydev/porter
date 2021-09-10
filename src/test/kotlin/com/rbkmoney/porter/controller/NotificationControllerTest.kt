@@ -6,6 +6,7 @@ import com.rbkmoney.openapi.notification.model.MarkAllNotifications
 import com.rbkmoney.openapi.notification.model.MarkNotifications
 import com.rbkmoney.porter.repository.entity.NotificationEntity
 import com.rbkmoney.porter.repository.entity.NotificationStatus
+import com.rbkmoney.porter.service.IdGenerator
 import com.rbkmoney.porter.service.NotificationService
 import com.rbkmoney.porter.service.model.NotificationFilter
 import com.rbkmoney.porter.service.pagination.Page
@@ -35,7 +36,7 @@ class NotificationControllerTest : AbstractControllerTest() {
     @Test
     fun `delete notification`() {
         // Given
-        val notificationId = UUID.randomUUID().toString()
+        val notificationId = IdGenerator.randomString()
 
         // When
         val mvcActions = mockMvc.perform(
@@ -82,7 +83,7 @@ class NotificationControllerTest : AbstractControllerTest() {
     @Test
     fun `get notification`() {
         // Given
-        val notificationId = UUID.randomUUID().toString()
+        val notificationId = IdGenerator.randomString()
         val notificationEntity = EasyRandom().nextObject(NotificationEntity::class.java).apply {
             this.notificationId = notificationId.toString()
         }
@@ -171,7 +172,7 @@ class NotificationControllerTest : AbstractControllerTest() {
         // Given
         val titleFilter = "my title"
         val notificationEntity = EasyRandom().nextObject(NotificationEntity::class.java).apply {
-            notificationId = UUID.randomUUID().toString()
+            notificationId = IdGenerator.randomString()
             status = NotificationStatus.unread
         }
 

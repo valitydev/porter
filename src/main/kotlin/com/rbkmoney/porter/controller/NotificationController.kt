@@ -38,10 +38,11 @@ class NotificationController(
     override fun deleteNotifications(xRequestID: String, request: DeleteNotification): ResponseEntity<Void> {
         log.info { "Delete notifications. requestId=$xRequestID; notificationIds=${request.notificationIds}" }
         val partyId = keycloakService.partyId
-        notificationService.softDeleteNotification(
-            partyId,
-            *request.notificationIds.map { it.toString() }.toTypedArray()
-        )
+        val notificationIds = if (request.notificationIds.isNotEmpty()) {
+            request.notificationIds.map { it.toString() }.toTypedArray()
+        } else throw NotificationClientRequestException("Empty notification ids param")
+        notificationService.softDeleteNotification(partyId, *notificationIds)
+
         return ResponseEntity.ok().build()
     }
 
@@ -100,7 +101,10 @@ class NotificationController(
             com.rbkmoney.porter.repository.entity.NotificationStatus::class.java
         )!!
         val partyId = keycloakService.partyId
-        notificationService.notificationMark(partyId, request.notificationIds.map { it.toString() }, notificationStatus)
+        val notificationIds = if (request.notificationIds.isNotEmpty()) {
+            request.notificationIds.map { it.toString() }
+        } else throw NotificationClientRequestException("Empty notification ids param")
+        notificationService.notificationMark(partyId, notificationIds, notificationStatus)
         return ResponseEntity.ok().build()
     }
 

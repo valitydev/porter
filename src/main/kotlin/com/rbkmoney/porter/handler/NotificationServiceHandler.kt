@@ -10,6 +10,8 @@ import com.rbkmoney.notification.NotificationTemplatePartyResponse
 import com.rbkmoney.notification.NotificationTemplateSearchRequest
 import com.rbkmoney.notification.NotificationTemplateSearchResponse
 import com.rbkmoney.notification.PartyNotification
+import com.rbkmoney.notification.PartyNotificationRequest
+import com.rbkmoney.notification.PartyNotificationResponse
 import com.rbkmoney.porter.converter.model.NotificationTemplateEntityEnriched
 import com.rbkmoney.porter.repository.entity.NotificationStatus
 import com.rbkmoney.porter.service.NotificationSenderService
@@ -116,15 +118,12 @@ class NotificationServiceHandler(
     override fun findNotificationTemplates(
         request: NotificationTemplateSearchRequest,
     ): NotificationTemplateSearchResponse {
+        log.info { "Find notification templates request: $request" }
         val notificationTemplateFilter = NotificationTemplateFilter(
             title = request.title,
             content = request.content,
-            from = if (request.date != null && request.date.isSetRangeDateFilter)
-                TypeUtil.stringToLocalDateTime(request.date.rangeDateFilter.fromDate) else null,
-            to = if (request.date != null && request.date.isSetRangeDateFilter)
-                TypeUtil.stringToLocalDateTime(request.date.rangeDateFilter.toDate) else null,
-            date = if (request.date != null && request.date.isSetFixedDateFilter)
-                TypeUtil.stringToLocalDateTime(request.date.fixedDateFilter.date) else null
+            from = if (request.isSetDateFilter) TypeUtil.stringToLocalDateTime(request.dateFilter.fromDate) else null,
+            to = if (request.isSetDateFilter) TypeUtil.stringToLocalDateTime(request.dateFilter.toDate) else null,
         )
         val token: String? = request.continuation_token
         val continuationToken = token?.let { continuationTokenService.tokenFromString(token) }
@@ -147,6 +146,23 @@ class NotificationServiceHandler(
             }
         }.also {
             log.info { "Found ${it.notification_templates.size} notification template. continuationToken=${it.continuation_token}" }
+        }
+    }
+
+    override fun findPartyNotifications(request: PartyNotificationRequest): PartyNotificationResponse {
+        log.info { "Find party notifications: $request" }
+        val token: String? = request.continuation_token
+        val continuationToken = token?.let { continuationTokenService.tokenFromString(token) }
+        val notificationFilter = conversionService.convert(request, NotificationFilter::class.java)!!
+        val notificationsPage =
+            notificationService.findNotifications(filter = notificationFilter, continuationToken = continuationToken)
+
+        return PartyNotificationResponse().apply {
+            continuation_token = if (notificationsPage.hasNext)
+                continuationTokenService.tokenToString(notificationsPage.token!!) else null
+            parties = notificationsPage.entities.map {
+                conversionService.convert(it, PartyNotification::class.java)
+            }
         }
     }
 

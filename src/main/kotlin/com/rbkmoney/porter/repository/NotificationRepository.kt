@@ -5,12 +5,9 @@ import com.rbkmoney.porter.repository.entity.NotificationStatus
 import com.rbkmoney.porter.repository.entity.NotificationTemplateEntity
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.jpa.repository.QueryHints
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import java.util.stream.Stream
-import javax.persistence.QueryHint
 
 @Repository
 interface NotificationRepository :
@@ -35,7 +32,13 @@ interface NotificationRepository :
     fun findByNotificationId(notificationId: String): NotificationEntity?
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("update NotificationEntity n set n.status = :status where n.partyId = :partyId and n.notificationId in (:notificationIds)")
+    @Query(
+        """
+        update NotificationEntity n set n.status = :status
+            where n.partyEntity.id in (select p.id from PartyEntity p where p.partyId = :partyId)
+                and n.notificationId in (:notificationIds)
+        """
+    )
     fun markNotifications(
         @Param("partyId") partyId: String,
         @Param("notificationIds") notificationIds: List<String>,
@@ -43,24 +46,33 @@ interface NotificationRepository :
     )
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("update NotificationEntity n set n.status = :status where n.partyId = :partyId")
-    fun markAllNotifications(@Param("partyId") partyId: String, @Param("status") notificationStatus: NotificationStatus)
-
-    @QueryHints(
-        value = [
-            QueryHint(name = org.hibernate.jpa.QueryHints.HINT_CACHEABLE, value = "false"),
-            QueryHint(name = org.hibernate.annotations.QueryHints.READ_ONLY, value = "true")
-        ]
+    @Query(
+        """
+        update NotificationEntity n set n.status = :status
+            where n.partyEntity.id in (select p.id from PartyEntity p where p.partyId = :partyId)
+        """
     )
-    fun findAllByPartyId(partyId: String): Stream<NotificationEntity>
+    fun markAllNotifications(@Param("partyId") partyId: String, @Param("status") notificationStatus: NotificationStatus)
 
     fun findByNotificationIdIn(notificationIds: List<String>): List<NotificationEntity>
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("update NotificationEntity n set n.deleted = true where n.partyId = :partyId and n.notificationId = :notificationId")
+    @Query(
+        """
+        update NotificationEntity n set n.deleted = true
+            where n.partyEntity.id in (select p.id from PartyEntity p where p.partyId = :partyId)
+                and n.notificationId = :notificationId
+        """
+    )
     fun softDeleteByPartyIdAndNotificationId(partyId: String, notificationId: String)
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("update NotificationEntity n set n.deleted = true where n.partyId = :partyId and n.notificationId in (:notificationIds)")
+    @Query(
+        """
+        update NotificationEntity n set n.deleted = true
+            where n.partyEntity.id in (select p.id from PartyEntity p where p.partyId = :partyId)
+                and n.notificationId in (:notificationIds)
+        """
+    )
     fun softDeleteAllByPartyIdAndNotificationIdIn(partyId: String, notificationIds: List<String>)
 }

@@ -25,7 +25,6 @@ class NotificationTemplateRepositoryCustomImpl(
         to: LocalDateTime?,
         title: String?,
         content: String?,
-        fixedDate: LocalDateTime?,
         limit: Int,
     ): Page<NotificationTemplateEntity> {
         val cb: CriteriaBuilder = entityManager.criteriaBuilder
@@ -35,12 +34,10 @@ class NotificationTemplateRepositoryCustomImpl(
         val predicates = mutableListOf<Predicate>().apply {
             add(titlePredicate(cb, root, title))
             add(contentPredicate(cb, root, content))
-            if (fixedDate != null) {
-                add(datePredicate(cb, root, fixedDate))
-            } else {
+            if (from != null && to != null) {
                 add(fromPredicate(cb, root, from))
+                add(toPredicate(cb, root, to))
             }
-            add(toPredicate(cb, root, to))
         }
 
         val criteriaQuery = query.select(root)
@@ -57,7 +54,6 @@ class NotificationTemplateRepositoryCustomImpl(
             content?.let { put("content", content) }
             from?.let { put("from", TypeUtil.temporalToString(from)) }
             to?.let { put("to", TypeUtil.temporalToString(to)) }
-            fixedDate?.let { put("date", TypeUtil.temporalToString(fixedDate)) }
         }
 
         return continuationTokenService.createPage(resultList, null, keyParams, limit + 1)
@@ -77,7 +73,6 @@ class NotificationTemplateRepositoryCustomImpl(
         continuationToken.keyParams?.let {
             predicates.add(titlePredicate(cb, root, continuationToken.keyParams["title"]))
             predicates.add(contentPredicate(cb, root, continuationToken.keyParams["content"]))
-            predicates.add(datePredicate(cb, root, continuationToken.keyParams["date"]))
         }
         predicates.add(
             continuationPredicate(cb, root, continuationToken.timestamp, continuationToken.id.toLong())
@@ -116,27 +111,6 @@ class NotificationTemplateRepositoryCustomImpl(
         return if (content != null) {
             val searchedText = "%${content.lowercase()}%"
             cb.like(cb.lower(root.get<String>("content")), searchedText)
-        } else cb.conjunction()
-    }
-
-    private fun datePredicate(cb: CriteriaBuilder, root: Root<NotificationTemplateEntity>, date: String?): Predicate {
-        return if (date != null) {
-            val utcDate = TypeUtil.stringToLocalDateTime(date)
-            val createdAtPath = root.get<LocalDateTime>("createdAt")
-            val updatedAtPath = root.get<LocalDateTime>("updatedAt")
-            cb.or(cb.equal(createdAtPath, utcDate), cb.equal(updatedAtPath, utcDate))
-        } else cb.conjunction()
-    }
-
-    private fun datePredicate(
-        cb: CriteriaBuilder,
-        root: Root<NotificationTemplateEntity>,
-        date: LocalDateTime?,
-    ): Predicate {
-        return if (date != null) {
-            val createdAtPath = root.get<LocalDateTime>("createdAt")
-            val updatedAtPath = root.get<LocalDateTime>("updatedAt")
-            cb.or(cb.equal(createdAtPath, date), cb.equal(updatedAtPath, date))
         } else cb.conjunction()
     }
 

@@ -7,5 +7,4 @@ data class NotificationTemplateFilter(
     val content: String? = null,
     val from: LocalDateTime? = null,
     val to: LocalDateTime? = null,
-    val date: LocalDateTime? = null,
 )

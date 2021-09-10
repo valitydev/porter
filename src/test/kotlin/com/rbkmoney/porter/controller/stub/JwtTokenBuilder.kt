@@ -1,5 +1,6 @@
 package com.rbkmoney.porter.controller.stub
 
+import com.rbkmoney.porter.service.IdGenerator
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.json.JSONArray
@@ -12,7 +13,7 @@ import java.util.UUID
 class JwtTokenBuilder(val userId: String, val username: String, val email: String, val privateKey: PrivateKey?) {
 
     constructor(privateKey: PrivateKey?) : this(
-        UUID.randomUUID().toString(),
+        IdGenerator.randomString(),
         DEFAULT_USERNAME,
         DEFAULT_EMAIL,
         privateKey

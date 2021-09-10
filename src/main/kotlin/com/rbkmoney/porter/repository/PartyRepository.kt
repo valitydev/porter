@@ -22,4 +22,6 @@ interface PartyRepository : CrudRepository<PartyEntity, Long> {
     fun findAllByStatus(status: PartyStatus): Stream<PartyEntity>
 
     fun findByPartyId(partyId: String): PartyEntity?
+
+    fun findByPartyIdIn(partyIds: List<String>): List<PartyEntity>
 }

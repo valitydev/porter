@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 
 data class NotificationFilter(
     val partyId: String? = null,
+    val email: String? = null,
     val templateId: String? = null,
     val deleted: Boolean? = null,
     val status: NotificationStatus? = null,

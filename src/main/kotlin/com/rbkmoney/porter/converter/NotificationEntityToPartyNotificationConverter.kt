@@ -1,5 +1,6 @@
 package com.rbkmoney.porter.converter
 
+import com.rbkmoney.geck.common.util.TypeUtil
 import com.rbkmoney.notification.NotificationStatus
 import com.rbkmoney.notification.Party
 import com.rbkmoney.notification.PartyNotification
@@ -16,8 +17,9 @@ class NotificationEntityToPartyNotificationConverter(
     override fun convert(notificationEntity: NotificationEntity): PartyNotification {
         return PartyNotification().apply {
             templateId = notificationEntity.notificationTemplateEntity?.templateId
-            party = Party(notificationEntity.partyId!!)
+            party = Party(notificationEntity.partyEntity?.partyId, notificationEntity.partyEntity?.email)
             status = conversionService.convert(notificationEntity.status, NotificationStatus::class.java)
+            createdAt = TypeUtil.temporalToString(notificationEntity.createdAt)
         }
     }
 }

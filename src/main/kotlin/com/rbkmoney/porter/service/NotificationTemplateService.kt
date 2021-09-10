@@ -2,24 +2,19 @@ package com.rbkmoney.porter.service
 
 import com.rbkmoney.notification.BadNotificationTemplateState
 import com.rbkmoney.notification.NotificationTemplateNotFound
-import com.rbkmoney.porter.repository.NotificationRepository
 import com.rbkmoney.porter.repository.NotificationTemplateRepository
 import com.rbkmoney.porter.repository.entity.NotificationTemplateEntity
 import com.rbkmoney.porter.repository.entity.NotificationTemplateStatus
 import com.rbkmoney.porter.service.model.NotificationTemplateFilter
 import com.rbkmoney.porter.service.pagination.ContinuationToken
 import com.rbkmoney.porter.service.pagination.Page
-import org.springframework.core.convert.ConversionService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.util.UUID
 
 @Service
 class NotificationTemplateService(
-    private val conversionService: ConversionService,
-    private val notificationTemplateRepository: NotificationTemplateRepository,
-    private val notificationRepository: NotificationRepository,
+    private val notificationTemplateRepository: NotificationTemplateRepository
 ) {
 
     fun createNotificationTemplate(
@@ -29,7 +24,7 @@ class NotificationTemplateService(
     ): NotificationTemplateEntity {
         return notificationTemplateRepository.save(
             NotificationTemplateEntity().apply {
-                templateId = UUID.randomUUID().toString()
+                templateId = IdGenerator.randomString()
                 createdAt = LocalDateTime.now()
                 this.title = title
                 this.content = content
@@ -81,7 +76,6 @@ class NotificationTemplateService(
                 to = filter?.to,
                 title = filter?.title,
                 content = filter?.content,
-                fixedDate = filter?.date,
                 limit = limit
             )
         }

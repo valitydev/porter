@@ -38,7 +38,7 @@ class NotificationConverterTest(
         // Then
         assertEquals(notificationEntity.notificationTemplateEntity?.templateId, partyNotification?.template_id)
         assertTrue(partyNotification?.status == com.rbkmoney.notification.NotificationStatus.unread)
-        assertEquals(notificationEntity.partyId, partyNotification?.party?.party_id)
+        assertEquals(notificationEntity.partyEntity!!.partyId, partyNotification?.party?.party_id)
     }
 
     @Test

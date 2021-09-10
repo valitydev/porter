@@ -13,6 +13,7 @@ import javax.persistence.Enumerated
 import javax.persistence.FetchType
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
+import javax.persistence.OneToOne
 import javax.persistence.Table
 
 @Entity
@@ -30,8 +31,9 @@ class NotificationEntity : BaseEntity<Long>(), PageableEntity<Long> {
     @Column(nullable = false)
     var notificationId: String? = null
 
-    @Column(nullable = false)
-    var partyId: String? = null
+    @OneToOne
+    @JoinColumn(name = "party_ref_id")
+    var partyEntity: PartyEntity? = null
 
     @Enumerated(EnumType.STRING)
     @Type(type = "pgsql_enum")

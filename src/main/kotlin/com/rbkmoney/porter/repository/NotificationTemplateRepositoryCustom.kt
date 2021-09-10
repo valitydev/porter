@@ -12,7 +12,6 @@ interface NotificationTemplateRepositoryCustom {
         to: LocalDateTime? = null,
         title: String? = null,
         content: String? = null,
-        fixedDate: LocalDateTime? = null,
         limit: Int = 10,
     ): Page<NotificationTemplateEntity>
 

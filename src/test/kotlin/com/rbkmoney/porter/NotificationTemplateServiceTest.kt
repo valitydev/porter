@@ -6,6 +6,7 @@ import com.rbkmoney.porter.repository.NotificationRepository
 import com.rbkmoney.porter.repository.NotificationTemplateRepository
 import com.rbkmoney.porter.repository.entity.NotificationTemplateEntity
 import com.rbkmoney.porter.repository.entity.NotificationTemplateStatus
+import com.rbkmoney.porter.service.IdGenerator
 import com.rbkmoney.porter.service.NotificationTemplateService
 import com.rbkmoney.porter.service.model.NotificationTemplateFilter
 import org.jeasy.random.EasyRandom
@@ -69,7 +70,7 @@ class NotificationTemplateServiceTest : AbstractIntegrationTest() {
             id = null
             title = "test title"
             content = "<p>I really like using Markdown.</p>"
-            templateId = UUID.randomUUID().toString()
+            templateId = IdGenerator.randomString()
         }
 
         // When
@@ -92,7 +93,7 @@ class NotificationTemplateServiceTest : AbstractIntegrationTest() {
     fun `modify unknown notification template`() {
         assertThrows(NotificationTemplateNotFound::class.java) {
             notificationTemplateService.editNotificationTemplate(
-                UUID.randomUUID().toString(),
+                IdGenerator.randomString(),
                 "testTitle",
                 "testContent"
             )
@@ -124,7 +125,7 @@ class NotificationTemplateServiceTest : AbstractIntegrationTest() {
             id = null
             content = "<p>I really like using Markdown.</p>"
             contentType = "text/markdown; charset=UTF-8"
-            templateId = UUID.randomUUID().toString()
+            templateId = IdGenerator.randomString()
             status = NotificationTemplateStatus.final
         }
 
@@ -181,7 +182,7 @@ class NotificationTemplateServiceTest : AbstractIntegrationTest() {
         // Given
         val notificationTemplates = EasyRandom().objects(NotificationTemplateEntity::class.java, 20).peek {
             it.id = null
-            it.templateId = UUID.randomUUID().toString()
+            it.templateId = IdGenerator.randomString()
             it.status = NotificationTemplateStatus.draft
         }.collect(Collectors.toList())
 
@@ -203,11 +204,11 @@ class NotificationTemplateServiceTest : AbstractIntegrationTest() {
         val firstTemplatesStream = EasyRandom().objects(NotificationTemplateEntity::class.java, 20).peek {
             it.id = null
             it.title = "test"
-            it.templateId = UUID.randomUUID().toString()
+            it.templateId = IdGenerator.randomString()
         }
         val secondTemplatesStream = EasyRandom().objects(NotificationTemplateEntity::class.java, 10).peek {
             it.id = null
-            it.templateId = UUID.randomUUID().toString()
+            it.templateId = IdGenerator.randomString()
         }
         val notificationTemplates =
             Stream.concat(firstTemplatesStream, secondTemplatesStream).collect(Collectors.toList())
@@ -232,7 +233,7 @@ class NotificationTemplateServiceTest : AbstractIntegrationTest() {
     @Test
     fun `test notification templates pagination with params by title`() {
         // Given
-        val templateId = UUID.randomUUID().toString()
+        val templateId = IdGenerator.randomString()
         val searchedNotificationEntity =
             Stream.of(
                 EasyRandom().nextObject(NotificationTemplateEntity::class.java).apply {
@@ -264,7 +265,7 @@ class NotificationTemplateServiceTest : AbstractIntegrationTest() {
         val searchedNotificationEntity = EasyRandom().nextObject(NotificationTemplateEntity::class.java).apply {
             id = null
             content = "<p>I really like using Markdown.</p>"
-            templateId = UUID.randomUUID().toString()
+            templateId = IdGenerator.randomString()
         }
         val notificationTemplates = EasyRandom().objects(NotificationTemplateEntity::class.java, 10).peek {
             it.id = null
@@ -291,12 +292,12 @@ class NotificationTemplateServiceTest : AbstractIntegrationTest() {
         val fromNotificationEntity = EasyRandom().nextObject(NotificationTemplateEntity::class.java).apply {
             id = null
             createdAt = fromDate
-            templateId = UUID.randomUUID().toString()
+            templateId = IdGenerator.randomString()
         }
         val toNotificationEntity = EasyRandom().nextObject(NotificationTemplateEntity::class.java).apply {
             id = null
             createdAt = toDate
-            templateId = UUID.randomUUID().toString()
+            templateId = IdGenerator.randomString()
         }
         val notificationTemplates = EasyRandom().objects(NotificationTemplateEntity::class.java, 10).peek {
             it.id = null
@@ -326,39 +327,11 @@ class NotificationTemplateServiceTest : AbstractIntegrationTest() {
     }
 
     @Test
-    fun `test notification template pagination with params by fixed date`() {
-        // Given
-        val date = LocalDateTime.now()
-        val notificationEntity = EasyRandom().nextObject(NotificationTemplateEntity::class.java).apply {
-            id = null
-            createdAt = date
-            templateId = UUID.randomUUID().toString()
-        }
-        val notificationTemplates = EasyRandom().objects(NotificationTemplateEntity::class.java, 10).peek {
-            it.id = null
-            it.createdAt = date.plusDays(1)
-        }.collect(Collectors.toList()).also {
-            it.add(notificationEntity)
-        }
-
-        // When
-        notificationTemplateRepository.saveAll(notificationTemplates)
-        val page = notificationTemplateService.findNotificationTemplate(
-            filter = NotificationTemplateFilter(date = date),
-            limit = 1
-        )
-
-        // Then
-        assertTrue(page.entities.size == 1)
-        assertEquals(notificationEntity.templateId, page.entities.first().templateId)
-    }
-
-    @Test
     fun `test notification template pagination order`() {
         // Given
         val notificationTemplates = EasyRandom().objects(NotificationTemplateEntity::class.java, 20).peek {
             it.id = null
-            it.templateId = UUID.randomUUID().toString()
+            it.templateId = IdGenerator.randomString()
             it.status = NotificationTemplateStatus.draft
         }.collect(Collectors.toList())
 
