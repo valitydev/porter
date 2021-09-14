@@ -1,6 +1,5 @@
 package com.rbkmoney.porter.handler
 
-import com.rbkmoney.geck.common.util.TypeUtil
 import com.rbkmoney.notification.NotificationServiceSrv
 import com.rbkmoney.notification.NotificationTemplate
 import com.rbkmoney.notification.NotificationTemplateCreateRequest
@@ -18,6 +17,7 @@ import com.rbkmoney.porter.service.NotificationSenderService
 import com.rbkmoney.porter.service.NotificationService
 import com.rbkmoney.porter.service.NotificationTemplateService
 import com.rbkmoney.porter.service.PartyService
+import com.rbkmoney.porter.service.model.DateFilter
 import com.rbkmoney.porter.service.model.NotificationFilter
 import com.rbkmoney.porter.service.model.NotificationTemplateFilter
 import com.rbkmoney.porter.service.pagination.ContinuationTokenService
@@ -87,6 +87,11 @@ class NotificationServiceHandler(
         }
     }
 
+    override fun removeNotificationTemplate(templateId: String) {
+        log.info { "Remove notification template by templateId=$templateId" }
+        notificationTemplateService.removeNotificationTemplate(templateId)
+    }
+
     override fun findNotificationTemplateParties(
         request: NotificationTemplatePartyRequest,
     ): NotificationTemplatePartyResponse {
@@ -119,11 +124,17 @@ class NotificationServiceHandler(
         request: NotificationTemplateSearchRequest,
     ): NotificationTemplateSearchResponse {
         log.info { "Find notification templates request: $request" }
+        val createdAtDateFilter = if (request.isSetCreatedDateFilter) {
+            conversionService.convert(request.createdDateFilter, DateFilter::class.java)
+        } else null
+        val sentAtDateFilter = if (request.isSetSentDateFilter) {
+            conversionService.convert(request.sentDateFilter, DateFilter::class.java)
+        } else null
         val notificationTemplateFilter = NotificationTemplateFilter(
             title = request.title,
             content = request.content,
-            from = if (request.isSetDateFilter) TypeUtil.stringToLocalDateTime(request.dateFilter.fromDate) else null,
-            to = if (request.isSetDateFilter) TypeUtil.stringToLocalDateTime(request.dateFilter.toDate) else null,
+            createdDateFilter = createdAtDateFilter,
+            sentDateFilter = sentAtDateFilter
         )
         val token: String? = request.continuation_token
         val continuationToken = token?.let { continuationTokenService.tokenFromString(token) }

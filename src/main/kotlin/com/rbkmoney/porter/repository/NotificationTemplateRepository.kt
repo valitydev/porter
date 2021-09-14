@@ -10,4 +10,6 @@ interface NotificationTemplateRepository :
     NotificationTemplateRepositoryCustom {
 
     fun findByTemplateId(templateId: String): NotificationTemplateEntity?
+
+    fun deleteByTemplateId(templateId: String)
 }

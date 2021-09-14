@@ -2,6 +2,7 @@ package com.rbkmoney.porter.service
 
 import com.rbkmoney.notification.BadNotificationTemplateState
 import com.rbkmoney.notification.NotificationTemplateNotFound
+import com.rbkmoney.porter.repository.NotificationRepository
 import com.rbkmoney.porter.repository.NotificationTemplateRepository
 import com.rbkmoney.porter.repository.entity.NotificationTemplateEntity
 import com.rbkmoney.porter.repository.entity.NotificationTemplateStatus
@@ -14,7 +15,8 @@ import java.time.LocalDateTime
 
 @Service
 class NotificationTemplateService(
-    private val notificationTemplateRepository: NotificationTemplateRepository
+    private val notificationTemplateRepository: NotificationTemplateRepository,
+    private val notificationRepository: NotificationRepository,
 ) {
 
     fun createNotificationTemplate(
@@ -72,12 +74,18 @@ class NotificationTemplateService(
             notificationTemplateRepository.findNextNotificationTemplates(continuationToken, limit)
         } else {
             notificationTemplateRepository.findNotificationTemplates(
-                from = filter?.from,
-                to = filter?.to,
+                createdAt = filter?.createdDateFilter,
+                sentAt = filter?.sentDateFilter,
                 title = filter?.title,
                 content = filter?.content,
                 limit = limit
             )
         }
+    }
+
+    @Transactional
+    fun removeNotificationTemplate(templateId: String) {
+        notificationRepository.deleteByNotificationTemplateEntity_TemplateId(templateId)
+        notificationTemplateRepository.deleteByTemplateId(templateId)
     }
 }

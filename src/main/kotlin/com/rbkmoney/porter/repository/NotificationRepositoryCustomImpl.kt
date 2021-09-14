@@ -48,14 +48,14 @@ class NotificationRepositoryCustomImpl(
 
         val resultList = entityManager.createQuery(criteriaQuery).setMaxResults(limit + 1).resultList.toList()
         val keyParams = HashMap<String, String>().apply {
-            filter?.templateId?.let { put("template_id", it) }
-            filter?.partyId?.let { put("party_id", it) }
-            filter?.email?.let { put("email", it) }
-            filter?.title?.let { put("title", it) }
-            filter?.status?.let { put("status", it.name) }
-            filter?.deleted?.let { put("deleted", it.toString()) }
-            filter?.fromTime?.let { put("from_time", TypeUtil.temporalToString(it)) }
-            filter?.toTime?.let { put("to_time", TypeUtil.temporalToString(it)) }
+            filter?.templateId?.let { put(TEMPLATE_ID_PARAM, it) }
+            filter?.partyId?.let { put(PARTY_ID_PARAM, it) }
+            filter?.email?.let { put(EMAIL_PARAM, it) }
+            filter?.title?.let { put(TITLE_PARAM, it) }
+            filter?.status?.let { put(STATUS_PARAM, it.name) }
+            filter?.deleted?.let { put(DELETED_PARAM, it.toString()) }
+            filter?.fromTime?.let { put(FROM_TIME_PARAM, TypeUtil.temporalToString(it)) }
+            filter?.toTime?.let { put(TO_TIME_PARAM, TypeUtil.temporalToString(it)) }
         }
 
         return continuationTokenService.createPage(resultList, null, keyParams, limit + 1)
@@ -68,18 +68,18 @@ class NotificationRepositoryCustomImpl(
 
         val predicates = mutableListOf<Predicate>().apply {
             continuationToken.keyParams?.let { keyParams ->
-                add(templatePredicate(cb, root, keyParams["template_id"]))
-                add(partyPredicate(cb, root, keyParams["party_id"]))
-                add(emailPredicate(cb, root, keyParams["email"]))
-                add(titlePredicate(cb, root, keyParams["title"]))
-                add(statusPredicate(cb, root, keyParams["status"]))
-                add(deletedPredicate(cb, root, keyParams["deleted"]?.let { it.toBoolean() }))
+                add(templatePredicate(cb, root, keyParams[TEMPLATE_ID_PARAM]))
+                add(partyPredicate(cb, root, keyParams[PARTY_ID_PARAM]))
+                add(emailPredicate(cb, root, keyParams[EMAIL_PARAM]))
+                add(titlePredicate(cb, root, keyParams[TITLE_PARAM]))
+                add(statusPredicate(cb, root, keyParams[STATUS_PARAM]))
+                add(deletedPredicate(cb, root, keyParams[DELETED_PARAM]?.let { it.toBoolean() }))
                 add(
                     fromTimeToTimePredicate(
                         cb,
                         root,
-                        keyParams["from_time"]?.let { TypeUtil.stringToLocalDateTime(it) },
-                        keyParams["to_time"]?.let { TypeUtil.stringToLocalDateTime(it) }
+                        keyParams[FROM_TIME_PARAM]?.let { TypeUtil.stringToLocalDateTime(it) },
+                        keyParams[TO_TIME_PARAM]?.let { TypeUtil.stringToLocalDateTime(it) }
                     )
                 )
             }
@@ -185,5 +185,16 @@ class NotificationRepositoryCustomImpl(
             cb.greaterThanOrEqualTo(createdAtPath, timestamp),
             cb.greaterThan(idPath, id)
         )
+    }
+
+    private companion object KeyParams {
+        const val TEMPLATE_ID_PARAM = "template_id"
+        const val PARTY_ID_PARAM = "party_id"
+        const val EMAIL_PARAM = "email"
+        const val TITLE_PARAM = "title"
+        const val STATUS_PARAM = "status"
+        const val DELETED_PARAM = "deleted"
+        const val FROM_TIME_PARAM = "from_time"
+        const val TO_TIME_PARAM = "to_time"
     }
 }

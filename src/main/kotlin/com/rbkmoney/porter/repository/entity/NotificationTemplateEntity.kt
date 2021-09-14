@@ -29,6 +29,9 @@ class NotificationTemplateEntity : BaseEntity<Long>(), PageableEntity<Long> {
     @Column
     var updatedAt: LocalDateTime? = null
 
+    @Column
+    var sentAt: LocalDateTime? = null
+
     @Column(nullable = false)
     var title: String? = null
 

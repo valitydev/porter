@@ -75,4 +75,6 @@ interface NotificationRepository :
         """
     )
     fun softDeleteAllByPartyIdAndNotificationIdIn(partyId: String, notificationIds: List<String>)
+
+    fun deleteByNotificationTemplateEntity_TemplateId(templateId: String)
 }

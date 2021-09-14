@@ -2,6 +2,7 @@ package com.rbkmoney.porter.repository
 
 import com.rbkmoney.geck.common.util.TypeUtil
 import com.rbkmoney.porter.repository.entity.NotificationTemplateEntity
+import com.rbkmoney.porter.service.model.DateFilter
 import com.rbkmoney.porter.service.pagination.ContinuationToken
 import com.rbkmoney.porter.service.pagination.ContinuationTokenService
 import com.rbkmoney.porter.service.pagination.Page
@@ -21,8 +22,8 @@ class NotificationTemplateRepositoryCustomImpl(
 ) : NotificationTemplateRepositoryCustom {
 
     override fun findNotificationTemplates(
-        from: LocalDateTime?,
-        to: LocalDateTime?,
+        createdAt: DateFilter?,
+        sentAt: DateFilter?,
         title: String?,
         content: String?,
         limit: Int,
@@ -34,9 +35,13 @@ class NotificationTemplateRepositoryCustomImpl(
         val predicates = mutableListOf<Predicate>().apply {
             add(titlePredicate(cb, root, title))
             add(contentPredicate(cb, root, content))
-            if (from != null && to != null) {
-                add(fromPredicate(cb, root, from))
-                add(toPredicate(cb, root, to))
+            if (createdAt != null) {
+                add(createdAtFromPredicate(cb, root, createdAt.from))
+                add(createdAtToPredicate(cb, root, createdAt.to))
+            }
+            if (sentAt != null) {
+                add(sentAtFromPredicate(cb, root, sentAt.from))
+                add(sentAtToPredicate(cb, root, sentAt.to))
             }
         }
 
@@ -50,10 +55,16 @@ class NotificationTemplateRepositoryCustomImpl(
 
         val resultList = entityManager.createQuery(criteriaQuery).setMaxResults(limit + 1).resultList.toList()
         val keyParams = HashMap<String, String>().apply {
-            title?.let { put("title", title) }
-            content?.let { put("content", content) }
-            from?.let { put("from", TypeUtil.temporalToString(from)) }
-            to?.let { put("to", TypeUtil.temporalToString(to)) }
+            title?.let { put(TITLE_PARAM, title) }
+            content?.let { put(CONTENT_PARAM, content) }
+            createdAt?.let {
+                put(CREATED_AT_FROM_PARAM, TypeUtil.temporalToString(it.from))
+                put(CREATED_AT_TO_PARAM, TypeUtil.temporalToString(it.to))
+            }
+            sentAt?.let {
+                put(SENT_AT_FROM_PARAM, TypeUtil.temporalToString(it.from))
+                put(SENT_AT_TO_PARAM, TypeUtil.temporalToString(it.to))
+            }
         }
 
         return continuationTokenService.createPage(resultList, null, keyParams, limit + 1)
@@ -71,14 +82,15 @@ class NotificationTemplateRepositoryCustomImpl(
 
         val predicates = mutableListOf<Predicate>()
         continuationToken.keyParams?.let {
-            predicates.add(titlePredicate(cb, root, continuationToken.keyParams["title"]))
-            predicates.add(contentPredicate(cb, root, continuationToken.keyParams["content"]))
+            predicates.add(titlePredicate(cb, root, continuationToken.keyParams[TITLE_PARAM]))
+            predicates.add(contentPredicate(cb, root, continuationToken.keyParams[CONTENT_PARAM]))
         }
         predicates.add(
             continuationPredicate(cb, root, continuationToken.timestamp, continuationToken.id.toLong())
         )
         continuationToken.keyParams?.let {
-            predicates.add(toPredicate(cb, root, continuationToken.keyParams["to"]))
+            predicates.add(createdAtToPredicate(cb, root, continuationToken.keyParams[CREATED_AT_TO_PARAM]))
+            predicates.add(sentAtToPredicate(cb, root, continuationToken.keyParams[SENT_AT_TO_PARAM]))
         }
 
         val criteriaQuery = query.select(root)
@@ -114,7 +126,7 @@ class NotificationTemplateRepositoryCustomImpl(
         } else cb.conjunction()
     }
 
-    private fun fromPredicate(
+    private fun createdAtFromPredicate(
         cb: CriteriaBuilder,
         root: Root<NotificationTemplateEntity>,
         from: LocalDateTime?,
@@ -124,6 +136,17 @@ class NotificationTemplateRepositoryCustomImpl(
             createdAtPath,
             from ?: LocalDateTime.ofInstant(Instant.ofEpochSecond(0), ZoneId.of("UTC"))
         )
+    }
+
+    private fun sentAtFromPredicate(
+        cb: CriteriaBuilder,
+        root: Root<NotificationTemplateEntity>,
+        from: LocalDateTime?,
+    ): Predicate {
+        return if (from != null) {
+            val sentAtPath = root.get<LocalDateTime>("sentAt")
+            return cb.greaterThanOrEqualTo(sentAtPath, from)
+        } else cb.conjunction()
     }
 
     private fun continuationPredicate(
@@ -141,7 +164,7 @@ class NotificationTemplateRepositoryCustomImpl(
         )
     }
 
-    private fun toPredicate(
+    private fun createdAtToPredicate(
         cb: CriteriaBuilder,
         root: Root<NotificationTemplateEntity>,
         to: LocalDateTime?,
@@ -151,10 +174,44 @@ class NotificationTemplateRepositoryCustomImpl(
         } else cb.conjunction()
     }
 
-    private fun toPredicate(cb: CriteriaBuilder, root: Root<NotificationTemplateEntity>, to: String?): Predicate {
+    private fun createdAtToPredicate(
+        cb: CriteriaBuilder,
+        root: Root<NotificationTemplateEntity>,
+        to: String?
+    ): Predicate {
         return if (to != null) {
             val toDate = TypeUtil.stringToLocalDateTime(to)
             cb.lessThanOrEqualTo(root.get<LocalDateTime>("createdAt"), toDate)
         } else cb.conjunction()
+    }
+
+    private fun sentAtToPredicate(
+        cb: CriteriaBuilder,
+        root: Root<NotificationTemplateEntity>,
+        to: LocalDateTime?,
+    ): Predicate {
+        return if (to != null) {
+            cb.lessThanOrEqualTo(root.get<LocalDateTime>("sentAt"), to)
+        } else cb.conjunction()
+    }
+
+    private fun sentAtToPredicate(
+        cb: CriteriaBuilder,
+        root: Root<NotificationTemplateEntity>,
+        to: String?
+    ): Predicate {
+        return if (to != null) {
+            val toDate = TypeUtil.stringToLocalDateTime(to)
+            cb.lessThanOrEqualTo(root.get<LocalDateTime>("sentAt"), toDate)
+        } else cb.conjunction()
+    }
+
+    private companion object KeyParams {
+        const val TITLE_PARAM = "title"
+        const val CONTENT_PARAM = "content"
+        const val CREATED_AT_FROM_PARAM = "created_at_from"
+        const val CREATED_AT_TO_PARAM = "created_at_to"
+        const val SENT_AT_FROM_PARAM = "sent_at_from"
+        const val SENT_AT_TO_PARAM = "sent_at_to"
     }
 }

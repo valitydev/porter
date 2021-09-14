@@ -8,6 +8,7 @@ CREATE TABLE notify.notification_template
     template_id  CHARACTER VARYING              NOT NULL,
     created_at   TIMESTAMP WITHOUT TIME ZONE    NOT NULL,
     updated_at   TIMESTAMP WITHOUT TIME ZONE,
+    sent_at      TIMESTAMP WITHOUT TIME ZONE,
     title        VARCHAR                        NOT NULL,
     content      TEXT                           NOT NULL,
     content_type CHARACTER VARYING,
