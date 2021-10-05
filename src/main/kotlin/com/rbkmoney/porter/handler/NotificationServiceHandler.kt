@@ -178,6 +178,7 @@ class NotificationServiceHandler(
     }
 
     override fun sendNotification(templateId: String, partyIds: MutableList<String>) {
+        val partyIds = partyIds.toSet()
         log.info { "Send notification: templateId=$templateId; partyIds=$partyIds" }
         notificationSenderService.sendNotification(templateId, partyIds)
     }

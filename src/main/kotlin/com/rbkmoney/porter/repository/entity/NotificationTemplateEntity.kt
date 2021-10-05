@@ -47,7 +47,7 @@ class NotificationTemplateEntity : BaseEntity<Long>(), PageableEntity<Long> {
     var status: NotificationTemplateStatus = NotificationTemplateStatus.draft
 
     @OneToMany(mappedBy = "notificationTemplateEntity")
-    var notifications: List<NotificationEntity> = emptyList()
+    var notifications: MutableSet<NotificationEntity> = mutableSetOf()
 
     override val timestamp: Long
         get() = createdAt.toEpochSecond(ZoneOffset.UTC)

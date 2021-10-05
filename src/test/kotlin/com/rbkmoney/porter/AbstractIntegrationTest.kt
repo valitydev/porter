@@ -58,6 +58,7 @@ abstract class AbstractIntegrationTest {
                 "spring.datasource.password=${postgresql.password}",
                 "spring.jpa.show_sql=true",
                 "kafka.bootstrap-servers=${kafka.bootstrapServers}",
+                "spring.jpa.properties.hibernate.enable_lazy_load_no_trans=true"
             ).applyTo(applicationContext.environment)
         }
 

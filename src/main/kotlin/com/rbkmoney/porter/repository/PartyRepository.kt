@@ -23,5 +23,5 @@ interface PartyRepository : CrudRepository<PartyEntity, Long> {
 
     fun findByPartyId(partyId: String): PartyEntity?
 
-    fun findByPartyIdIn(partyIds: List<String>): List<PartyEntity>
+    fun findByPartyIdIn(partyIds: Collection<String>): List<PartyEntity>
 }

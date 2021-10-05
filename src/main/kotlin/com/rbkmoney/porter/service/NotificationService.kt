@@ -1,6 +1,7 @@
 package com.rbkmoney.porter.service
 
 import com.rbkmoney.notification.NotificationTemplateNotFound
+import com.rbkmoney.notification.PartyIdNotFound
 import com.rbkmoney.porter.repository.NotificationRepository
 import com.rbkmoney.porter.repository.NotificationTemplateRepository
 import com.rbkmoney.porter.repository.PartyRepository
@@ -22,7 +23,8 @@ class NotificationService(
     private val partyRepository: PartyRepository,
 ) {
 
-    fun createNotifications(templateId: String, partyIds: MutableList<String>) {
+    @Transactional
+    fun createNotifications(templateId: String, partyIds: Collection<String>) {
         val notificationTemplateEntity = notificationTemplateRepository.findByTemplateId(templateId)
             ?: throw NotificationTemplateNotFound()
         val parties = partyRepository.findByPartyIdIn(partyIds)
@@ -30,11 +32,12 @@ class NotificationService(
             NotificationEntity().apply {
                 this.notificationTemplateEntity = notificationTemplateEntity
                 this.partyEntity = parties.find { it.partyId == partyId }
-                    ?: throw IllegalStateException("Unknown partyId: $partyId")
+                    ?: throw PartyIdNotFound(partyId)
                 this.notificationId = IdGenerator.randomString()
             }
         }
         notificationRepository.saveAll(notificationEntities)
+        notificationTemplateEntity.notifications.addAll(notificationEntities)
     }
 
     @Transactional

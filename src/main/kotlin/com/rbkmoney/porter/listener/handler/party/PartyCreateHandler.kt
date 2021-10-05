@@ -21,7 +21,8 @@ class PartyCreateHandler(
     override fun handleChange(change: PartyChange, parent: MachineEvent) {
         val partyCreated = change.partyCreated
         val partyCreatedAt = TypeUtil.stringToLocalDateTime(partyCreated.createdAt)
-        val partyEntity = PartyEntity().apply {
+        val partyEntity = partyRepository.findByPartyId(partyCreated.id) ?: PartyEntity()
+        partyEntity.apply {
             partyId = partyCreated.id
             createdAt = partyCreatedAt
             email = partyCreated.contact_info.email

@@ -112,6 +112,7 @@ class SecurityConfig(
         val strings = Files.readAllLines(Paths.get(filePath))
         strings.removeAt(strings.size - 1)
         strings.removeAt(0)
-        return strings.stream().map { obj: String -> obj.trim { it <= ' ' } }.collect(Collectors.joining())
+
+        return strings.stream().map(String::trim).collect(Collectors.joining())
     }
 }

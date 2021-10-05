@@ -11,20 +11,20 @@ class NotificationSenderService(
 ) {
 
     @Transactional
-    fun sendNotification(tempalteId: String, partyIds: MutableList<String>) {
+    fun sendNotification(templateId: String, partyIds: Collection<String>) {
         notificationTemplateService.editNotificationTemplate(
-            templateId = tempalteId,
+            templateId = templateId,
             status = NotificationTemplateStatus.final
         )
-        notificationService.createNotifications(tempalteId, partyIds)
+        notificationService.createNotifications(templateId, partyIds)
     }
 
     @Transactional
-    fun sendNotificationAll(tempalteId: String) {
+    fun sendNotificationAll(templateId: String) {
         notificationTemplateService.editNotificationTemplate(
-            templateId = tempalteId,
+            templateId = templateId,
             status = NotificationTemplateStatus.final
         )
-        notificationService.createNotifications(tempalteId)
+        notificationService.createNotifications(templateId)
     }
 }

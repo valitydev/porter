@@ -1,5 +1,6 @@
 package com.rbkmoney.porter
 
+import com.rbkmoney.damsel.domain.PartyContactInfo
 import com.rbkmoney.geck.common.util.TypeUtil
 import com.rbkmoney.machinegun.eventsink.SinkEvent
 import com.rbkmoney.porter.repository.PartyRepository
@@ -109,6 +110,38 @@ class PartyListenerTest : AbstractIntegrationTest() {
         assertEquals(
             TypeUtil.stringToLocalDateTime(partyChange.partyCreated.createdAt).withNano(0),
             party.createdAt?.withNano(0)
+        )
+    }
+
+    @Test
+    fun `test duplicate party create event`() {
+        // Given
+        val partyId = "testPartyId"
+        val partyEmail = "test@mail.kek"
+        val sequenceId = AtomicLong(0L)
+        val partyChange = MachineEventBuilder.buildPartyCreatedPartyChange(partyId)
+        val secondPartyChange = MachineEventBuilder.buildPartyCreatedPartyChange(partyId)
+        secondPartyChange.partyCreated.contact_info = PartyContactInfo(partyEmail)
+        val partyCreateEvent = MachineEventBuilder.buildMachineEvent(partyId, sequenceId.incrementAndGet(), partyChange)
+        val secondPartyCreateEvent =
+            MachineEventBuilder.buildMachineEvent(partyId, sequenceId.incrementAndGet(), secondPartyChange)
+        val partyEvents = listOf<SinkEvent>(
+            MachineEventBuilder.buildSinkEvent(partyCreateEvent),
+            MachineEventBuilder.buildSinkEvent(secondPartyCreateEvent)
+        ).forEach { sendMachineEvent(it) }
+
+        // When
+        val partyEntity = await.pollInterval(1, TimeUnit.SECONDS).atMost(60, TimeUnit.SECONDS).untilNotNull {
+            val party = partyRepository.findByPartyId(partyId)
+            party
+        }
+
+        // Then
+        assertEquals(secondPartyChange.partyCreated.id, partyEntity.partyId)
+        assertEquals(secondPartyChange.partyCreated.contactInfo.email, partyEmail)
+        assertEquals(
+            TypeUtil.stringToLocalDateTime(secondPartyChange.partyCreated.createdAt).withNano(0),
+            partyEntity.createdAt?.withNano(0)
         )
     }
 }
