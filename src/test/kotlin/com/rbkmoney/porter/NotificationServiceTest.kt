@@ -439,6 +439,40 @@ class NotificationServiceTest : AbstractIntegrationTest() {
     }
 
     @Test
+    fun `find notification by deleted filter`() {
+        // Given
+        val notificationTemplateEntity = EasyRandom().nextObject(NotificationTemplateEntity::class.java).apply {
+            id = null
+            templateId = IdGenerator.randomString()
+            title = "Some test title"
+        }
+        val notifications = EasyRandom().objects(NotificationEntity::class.java, 2)
+            .peek {
+                it.partyEntity = this.partyEntity
+                it.notificationTemplateEntity = notificationTemplateEntity
+                it.notificationId = IdGenerator.randomString()
+                it.status = NotificationStatus.unread
+                it.deleted = false
+            }.collect(Collectors.toList())
+
+        // When
+        notificationTemplateRepository.save(notificationTemplateEntity)
+        notificationRepository.saveAll(notifications)
+        notificationService.createNotifications(notificationTemplateEntity.templateId!!)
+        val notificationEntity = notifications.first()
+        notificationService.softDeleteNotification(
+            notificationEntity.partyEntity?.partyId!!,
+            notificationEntity.notificationId!!
+        )
+        val notificationPage = notificationService.findNotifications(NotificationFilter(deleted = true))
+
+        // Then
+        assertFalse(notificationPage.hasNext)
+        assertTrue(notificationPage.entities.size == 1)
+        assertTrue(notificationPage.entities.first().deleted)
+    }
+
+    @Test
     fun `get notification test`() {
         // Given
         val notificationEntity = EasyRandom().nextObject(NotificationEntity::class.java).apply {

@@ -20,6 +20,7 @@ class NotificationEntityToPartyNotificationConverter(
             party = Party(notificationEntity.partyEntity?.partyId, notificationEntity.partyEntity?.email)
             status = conversionService.convert(notificationEntity.status, NotificationStatus::class.java)
             createdAt = TypeUtil.temporalToString(notificationEntity.createdAt)
+            deleted = notificationEntity.deleted
         }
     }
 }

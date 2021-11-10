@@ -16,7 +16,8 @@ class PartyNotificationRequestToNotificationFilterConverter :
             return NotificationFilter(
                 partyId = value.partyFilter.partyId,
                 fromTime = fromTime,
-                toTime = toTime
+                toTime = toTime,
+                deleted = value.deleteFilter?.is_deleted
             )
         }
         return NotificationFilter(
