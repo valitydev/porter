@@ -1,0 +1,18 @@
+name: Deploy Docker Image
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+
+  build-and-deploy:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: rbkmoney/build-actions/packages/jdk-build@v1.0.1
+      - uses: rbkmoney/build-actions/packages/deploy-docker@v1.0.1
+        with:
+          registry-username: ${{secrets.DOCKER_HUB_USERNAME}}
+          registry-password: ${{secrets.DOCKER_HUB_ACCESS_TOKEN}}

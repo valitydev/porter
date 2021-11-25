@@ -3,6 +3,7 @@ package com.rbkmoney.porter
 import com.rbkmoney.damsel.domain.PartyContactInfo
 import com.rbkmoney.geck.common.util.TypeUtil
 import com.rbkmoney.machinegun.eventsink.SinkEvent
+import com.rbkmoney.porter.repository.NotificationRepository
 import com.rbkmoney.porter.repository.PartyRepository
 import com.rbkmoney.porter.repository.entity.PartyStatus
 import org.awaitility.kotlin.await
@@ -18,10 +19,14 @@ import java.util.concurrent.atomic.AtomicLong
 class PartyListenerTest : AbstractIntegrationTest() {
 
     @Autowired
+    lateinit var notificationRepository: NotificationRepository
+
+    @Autowired
     lateinit var partyRepository: PartyRepository
 
     @BeforeEach
     internal fun setUp() {
+        notificationRepository.deleteAll()
         partyRepository.deleteAll()
     }
 

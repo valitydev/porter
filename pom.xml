@@ -30,18 +30,20 @@
         <db.user>postgres</db.user>
         <db.password>postgres</db.password>
         <db.schema>notify</db.schema>
-        <notification-proto.version>1.11-04d886f</notification-proto.version>
-        <testcontainers.version>1.14.3</testcontainers.version>
+        <notification-proto.version>1.13-d302092</notification-proto.version>
+        <testcontainers.version>1.16.2</testcontainers.version>
         <h2.version>1.4.200</h2.version>
         <hibernate-types.version>2.12.0</hibernate-types.version>
         <easy-random.version>5.0.0</easy-random.version>
         <machinegun-proto.version>1.19-f77367a</machinegun-proto.version>
-        <mg-event-sink-listener-spring-boot-starter.version>0.0.6-SNAPSHOT
+        <mg-event-sink-listener-spring-boot-starter.version>0.0.7
         </mg-event-sink-listener-spring-boot-starter.version>
-        <sink-common-lib.version>0.0.7</sink-common-lib.version>
+        <sink-common-lib.version>0.0.8</sink-common-lib.version>
         <awaitility.version>4.1.0</awaitility.version>
         <keycloak.version>15.0.0</keycloak.version>
-        <swag-notification.version>1.4-f1b40b2-server</swag-notification.version>
+        <swag-notification.version>1.8-99c80c8-server</swag-notification.version>
+        <dockerfile.base.service.tag>7e0c98bb</dockerfile.base.service.tag>
+        <shared-resources.version>1.4.0</shared-resources.version>
     </properties>
 
     <dependencies>
