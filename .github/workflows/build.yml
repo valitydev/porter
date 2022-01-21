@@ -1,4 +1,4 @@
-name: Build Artifact
+name: Build Maven Artifact
 
 on:
   pull_request:
@@ -6,9 +6,5 @@ on:
       - '*'
 
 jobs:
-
   build:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: rbkmoney/action-jdk-build@v1
+    uses: valitydev/base-workflow/.github/workflows/maven-service-build.yml@b940f993928d6d75395621af90f7d42af2cf824c
