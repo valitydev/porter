@@ -7,6 +7,6 @@ on:
 
 jobs:
   build-and-deploy:
-    uses: valitydev/base-workflow/.github/workflows/maven-service-deploy.yml@b940f993928d6d75395621af90f7d42af2cf824c
+    uses: valitydev/base-workflow/.github/workflows/maven-service-deploy.yml@v1
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}}
