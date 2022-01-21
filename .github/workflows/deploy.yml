@@ -9,4 +9,4 @@ jobs:
   build-and-deploy:
     uses: valitydev/base-workflow/.github/workflows/maven-service-deploy.yml@v1
     secrets:
-      github-token: ${{ secrets.GITHUB_TOKEN }}}
+      github-token: ${{ secrets.GITHUB_TOKEN }}
