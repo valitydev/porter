@@ -8,3 +8,5 @@ on:
 jobs:
   build:
     uses: valitydev/base-workflow/.github/workflows/maven-service-build.yml@experimental
+    with:
+      ignore-coverage: true
