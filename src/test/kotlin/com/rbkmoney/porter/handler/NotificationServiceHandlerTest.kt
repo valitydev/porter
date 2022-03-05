@@ -1,13 +1,6 @@
 package com.rbkmoney.porter.handler
 
-import com.rbkmoney.notification.NotificationContent
-import com.rbkmoney.notification.NotificationStatus
-import com.rbkmoney.notification.NotificationTemplate
-import com.rbkmoney.notification.NotificationTemplateCreateRequest
-import com.rbkmoney.notification.NotificationTemplateModifyRequest
-import com.rbkmoney.notification.NotificationTemplatePartyRequest
-import com.rbkmoney.notification.NotificationTemplateSearchRequest
-import com.rbkmoney.notification.PartyNotification
+import com.rbkmoney.notification.*
 import com.rbkmoney.porter.converter.model.NotificationTemplateEntityEnriched
 import com.rbkmoney.porter.repository.TotalNotificationProjection
 import com.rbkmoney.porter.repository.entity.NotificationEntity
@@ -20,11 +13,7 @@ import com.rbkmoney.porter.service.PartyService
 import com.rbkmoney.porter.service.pagination.ContinuationTokenService
 import com.rbkmoney.porter.service.pagination.Page
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.any
-import org.mockito.Mockito.anyString
-import org.mockito.Mockito.atMostOnce
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
