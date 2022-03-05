@@ -41,7 +41,6 @@ class NotificationSenderServiceTest : AbstractIntegrationTest() {
             templateId = TEMPLATE_ID
             title = TEMPLATE_TITLE
         }
-        notificationTemplateRepository.deleteAll()
         notificationTemplateEntity = notificationTemplateRepository.save(notificationTemplateObject)
     }
 
