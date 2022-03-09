@@ -9,7 +9,8 @@ class KeycloakOpenIdStub(
 ) {
     private val issuer: String = "$keycloakAuthServerUrl/realms/$keycloakRealm"
     private val openidConfig: String =
-        """{
+        """
+          {
             "issuer": "$issuer",
             "authorization_endpoint": "$keycloakAuthServerUrl/realms/$keycloakRealm/protocol/openid-connect/auth",
             "token_endpoint": "$keycloakAuthServerUrl/realms/$keycloakRealm/protocol/openid-connect/token",
@@ -20,7 +21,8 @@ class KeycloakOpenIdStub(
             "check_session_iframe": "$keycloakAuthServerUrl/realms/$keycloakRealm/protocol/openid-connect/login-status-iframe.html",
             "registration_endpoint": "$keycloakAuthServerUrl/realms/$keycloakRealm/clients-registrations/openid-connect",
             "introspection_endpoint": "$keycloakAuthServerUrl/realms/$keycloakRealm/protocol/openid-connect/token/introspect"
-        }"""
+          }
+        """
 
     fun givenStub() {
         WireMock.stubFor(
