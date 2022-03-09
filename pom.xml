@@ -326,7 +326,7 @@
             <plugin>
                 <groupId>com.github.gantsign.maven</groupId>
                 <artifactId>ktlint-maven-plugin</artifactId>
-                <version>1.9.0</version>
+                <version>1.12.1</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
