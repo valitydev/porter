@@ -1,12 +1,7 @@
 package com.rbkmoney.porter.controller
 
 import com.rbkmoney.openapi.notification.api.NotificationApi
-import com.rbkmoney.openapi.notification.model.DeleteNotification
-import com.rbkmoney.openapi.notification.model.MarkAllNotifications
-import com.rbkmoney.openapi.notification.model.MarkNotifications
-import com.rbkmoney.openapi.notification.model.Notification
-import com.rbkmoney.openapi.notification.model.NotificationSearchResult
-import com.rbkmoney.openapi.notification.model.NotificationStatus
+import com.rbkmoney.openapi.notification.model.*
 import com.rbkmoney.porter.service.KeycloakService
 import com.rbkmoney.porter.service.NotificationService
 import com.rbkmoney.porter.service.model.NotificationFilter
@@ -16,7 +11,7 @@ import org.springframework.core.convert.ConversionService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import java.time.OffsetDateTime
-import java.util.UUID
+import java.util.*
 
 private val log = KotlinLogging.logger {}
 
@@ -63,8 +58,8 @@ class NotificationController(
         continuationToken: String?,
     ): ResponseEntity<NotificationSearchResult> {
         log.info {
-            """Find notifications. requestId=$xRequestID; title=$title; status=$status; fromTime=$fromTime
-               toTime=$toTime, limit=$limit; continuationToken=$continuationToken"""
+            "Find notifications. requestId=$xRequestID; title=$title; status=$status; fromTime=$fromTime;" +
+                " toTime=$toTime; limit=$limit; continuationToken=$continuationToken"
         }
         val partyId = keycloakService.partyId
         val notificationStatus =

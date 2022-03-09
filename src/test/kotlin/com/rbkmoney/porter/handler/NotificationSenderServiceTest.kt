@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @TestPropertySource(
     properties = [
@@ -66,7 +67,7 @@ class NotificationSenderServiceTest : AbstractIntegrationTest() {
     }
 
     companion object {
-        const val TEMPLATE_ID = "testTemplateId"
+        const val TEMPLATE_ID = "12344598750"
         const val TEMPLATE_TITLE = "My first title"
     }
 }
