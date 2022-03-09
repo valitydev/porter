@@ -20,13 +20,13 @@ interface NotificationRepository :
 
     @Query(
         value =
-            """
-                SELECT total_count.total, read_count.read FROM
-                    (SELECT count(*) AS total FROM notify.notification WHERE template_id=:templateId) AS total_count,
-                    (SELECT count(*) AS read FROM notify.notification
-                        WHERE template_id=:templateId
-                            AND status=CAST('read' AS notify.notification_status)) AS read_count
-            """,
+        """
+            SELECT total_count.total, read_count.read FROM
+                (SELECT count(*) AS total FROM notify.notification WHERE template_id=:templateId) AS total_count,
+                (SELECT count(*) AS read FROM notify.notification
+                    WHERE template_id=:templateId
+                        AND status=CAST('read' AS notify.notification_status)) AS read_count
+        """,
         nativeQuery = true
     )
     fun findNotificationCount(@Param("templateId") templateId: Long): TotalNotificationProjection
